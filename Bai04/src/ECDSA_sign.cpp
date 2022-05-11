@@ -82,8 +82,13 @@ void LoadMessageFromFile(string filePath, string &message) {
 
 void LoadPrivateKeyFromFile(string filePath, ECDSA::PrivateKey &privateKey) {
   ByteQueue queue;
+  AutoSeededRandomPool rng;
+
   Misc::Load(filePath, queue);
   privateKey.Load(queue);
+  if (privateKey.Validate(rng, 3) == false) {
+    throw std::runtime_error("Invalid private key");
+  }
 }
 
 } // namespace Sign
