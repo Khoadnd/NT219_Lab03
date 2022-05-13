@@ -6,7 +6,7 @@ avg_time() {
     shift
     (($# > 0)) || return;
     { read foo real; read foo user; read foo sys ;} < <(
-        { time -p for((;n--;)){ "$@" &>/dev/null ;} ;} 2>&1
+        { time -p for((;n--;)){ "$@" &> /dev/null ;} ;} 2>&1
     )
     printf "%.5f\n" $(
         bc -l <<<"$real/$n;" )

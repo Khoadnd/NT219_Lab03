@@ -86,9 +86,9 @@ void LoadPrivateKeyFromFile(string filePath, ECDSA::PrivateKey &privateKey) {
 
   Misc::Load(filePath, queue);
   privateKey.Load(queue);
-  if (privateKey.Validate(rng, 3) == false) {
+
+  if (privateKey.Validate(rng, 3) == false)
     throw std::runtime_error("Invalid private key");
-  }
 }
 
 } // namespace Sign
