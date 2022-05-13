@@ -1,20 +1,12 @@
 #include "../include/big_int.hpp"
+#include "../include/big_int_helper.hpp"
 #include <algorithm>
 #include <cctype>
 #include <map>
+#include <utility>
 
 namespace Lab03 {
 namespace big_int {
-
-static std::map<byte, unsigned> h_d{{'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},
-                                    {'4', 4},  {'5', 5},  {'6', 6},  {'7', 7},
-                                    {'8', 8},  {'9', 9},  {'A', 10}, {'B', 11},
-                                    {'C', 12}, {'D', 13}, {'E', 14}, {'F', 15}};
-
-static std::map<unsigned, byte> d_h{{0, '0'},  {1, '1'},  {2, '2'},  {3, '3'},
-                                    {4, '4'},  {5, '5'},  {6, '6'},  {7, '7'},
-                                    {8, '8'},  {9, '9'},  {10, 'A'}, {11, 'B'},
-                                    {12, 'C'}, {13, 'D'}, {14, 'E'}, {15, 'F'}};
 
 unsigned_hex::unsigned_hex() : _length(0) {}
 
@@ -68,7 +60,7 @@ unsigned_hex unsigned_hex::operator+(const unsigned_hex &other) const {
   unsigned carry = 0;
   unsigned sum = 0;
 
-  unsigned i, j;
+  int i, j;
   for (i = _length - 1, j = other._length - 1; i >= 0 || j >= 0; i--, j--) {
     sum = h_d[_data[i]] + h_d[other._data[j]] + carry;
     result._data.push_back(d_h[sum % 16]);
@@ -97,17 +89,17 @@ unsigned_hex unsigned_hex::operator+(const unsigned_hex &other) const {
   return result;
 }
 
+unsigned_hex unsigned_hex::operator+(const unsigned &other) const {
+  unsigned_hex temp = int_to_hex(other);
+  return *this + temp;
+}
+
 void unsigned_hex::operator+=(const unsigned_hex &other) {
   *this = *this + other;
 }
 
 void unsigned_hex::operator+=(const unsigned &other) {
   *this = *this + int_to_hex(other);
-}
-
-unsigned_hex unsigned_hex::operator+(const unsigned &other) const {
-  unsigned_hex temp = int_to_hex(other);
-  return *this + temp;
 }
 
 unsigned_hex unsigned_hex::operator-(const unsigned_hex &other) const {
@@ -118,7 +110,7 @@ unsigned_hex unsigned_hex::operator-(const unsigned_hex &other) const {
   unsigned borrow = 0;
   unsigned diff = 0;
 
-  unsigned i, j;
+  int i, j;
   for (i = _length - 1, j = other._length - 1; i >= 0 || j >= 0; i--, j--) {
     diff = h_d[_data[i]] - h_d[other._data[j]] - borrow;
     if (diff < 0) {
@@ -196,7 +188,42 @@ void unsigned_hex::operator-=(const unsigned &other) {
   *this = *this - int_to_hex(other);
 }
 
-unsigned_hex unsigned_hex::operator*(const unsigned_hex &other) const {}
+unsigned_hex unsigned_hex::operator*(const unsigned_hex &other) const {
+  // to be implemented
+  unsigned_hex result;
+  unsigned_hex temp;
+  result._data.reserve(_length + other._length);
+  temp._data.reserve(_length + other._length);
+
+  unsigned mul = 0;
+  unsigned carry = 0;
+  int i, j;
+
+  for (j = other._length; j >= 0; --j) {
+    for (i = _length; i >= 0; --i) {
+      mul = h_mul[make_pair(_data[i], other._data[j])] + carry;
+      carry = mul / 16;
+      temp._data.push_back(d_h[mul % 16]);
+    }
+    result += temp * ((other._length - j) * 10);
+  }
+
+  result._length = result._data.size();
+  return result;
+}
+
+unsigned_hex unsigned_hex::operator*(const unsigned &other) const {
+  unsigned_hex temp = int_to_hex(other);
+  return *this * temp;
+}
+
+void unsigned_hex::operator*=(const unsigned_hex &other) {
+  *this = *this * other;
+}
+
+void unsigned_hex::operator*=(const unsigned &other) {
+  *this = *this * int_to_hex(other);
+}
 
 unsigned_hex unsigned_hex::operator~() const {
   unsigned_hex result;
@@ -234,8 +261,8 @@ std::ostream &operator<<(std::ostream &os, const unsigned_hex &out) {
 
 std::istream &operator>>(std::istream &is, unsigned_hex &in) {
   byte buffer = 0;
-  if (is.peek() == '-')
-    throw std::invalid_argument("Invalid input");
+  // if (is.peek() == '-')
+  //   throw std::invalid_argument("Invalid input");
 
   if (is >> buffer, buffer == '0' && is.peek() == 'x') { // input as hex
     is.ignore();
@@ -247,7 +274,7 @@ std::istream &operator>>(std::istream &is, unsigned_hex &in) {
       in._data.push_back(toupper(buffer));
     } while (is.peek() != '\n');
   } else // input as decimal, unimplemented
-    throw std::invalid_argument("Invalid input");
+    throw std::invalid_argument("Decimal input not implemented");
 
   in._length = in._data.size();
 

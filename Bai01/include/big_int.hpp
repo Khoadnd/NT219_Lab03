@@ -32,8 +32,8 @@ public:
 
   unsigned_hex operator*(const unsigned_hex &other) const;
   unsigned_hex operator*(const unsigned &other) const;
-  unsigned_hex operator*=(const unsigned_hex &other);
-  unsigned_hex operator*=(const unsigned &other);
+  void operator*=(const unsigned_hex &other);
+  void operator*=(const unsigned &other);
 
   unsigned_hex operator-() const;
   unsigned_hex operator~() const;

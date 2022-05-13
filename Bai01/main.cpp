@@ -4,8 +4,9 @@ using Lab03::big_int::unsigned_hex;
 #include <iostream>
 
 int main() {
-  unsigned_hex a;
+  unsigned_hex a, b;
   std::cin >> a;
-  std::cout << a + 12343 << std::endl;
+  std::cin >> b;
+  std::cout << "a * b = " << a * b << std::endl;
   return 0;
 }
