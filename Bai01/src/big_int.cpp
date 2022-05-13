@@ -268,8 +268,8 @@ std::istream &operator>>(std::istream &is, unsigned_hex &in) {
     is.ignore();
     do {
       is >> buffer;
-      if (buffer < '0' || tolower(buffer) > 'f' || buffer > '9' ||
-          tolower(buffer) < 'a')
+      if (buffer < '0' || tolower(buffer) > 'f' ||
+          (buffer > '9' && buffer < 'a'))
         throw std::invalid_argument("Invalid input");
       in._data.push_back(toupper(buffer));
     } while (is.peek() != '\n');
